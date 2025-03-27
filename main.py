@@ -1,5 +1,6 @@
 import streamlit as st
 import datetime
+import pytz
 import random
 import os
 
@@ -78,11 +79,16 @@ def display_eid_wishes(name, category):
         """, 
         unsafe_allow_html=True
     )
-
 def display_countdown():
     """Displays a countdown to Eid or an 'Eid Mubarak' message."""
-    today = datetime.date.today()
+    # Ensure the correct timezone (Set to your local timezone if needed)
+    tz = pytz.timezone("Asia/Karachi")  # Change according to your region
+    today = datetime.datetime.now(tz).date()  # Use timezone-aware date
     days_until_eid = (EID_DATE - today).days
+
+    # Ensure it does not display an extra day
+    if days_until_eid < 0:
+        days_until_eid = 0
 
     if days_until_eid > 0:
         st.markdown(
@@ -131,7 +137,7 @@ def user_input_wish():
             st.success("✅ Your wish has been saved!")
 
     # --- Display saved wishes ---
-    st.markdown(f"<h3 style='text-align: center; color: {COLORS['primary']}'>📜 Wishes Sent to Rida:</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='text-align: center; color: {COLORS['primary']}'>📜 Wishes Received by Rida:</h3>", unsafe_allow_html=True)
     wishes = load_wishes()
     
     if not wishes:
