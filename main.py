@@ -4,15 +4,14 @@ import pytz
 import random
 import os
 
-# MADE A EID WISHES APP
-#CONSTANT
+# --- Configuration ---
 EID_DATE = datetime.date(2025, 3, 31)  # Approximate Eid date for 2025
 SAVE_FILE = "save.txt"  # File to store user wishes
 
 COLORS = {
-    "primary": "#8B008B", 
-    "background": "#FFF8DC", 
-    "wish_box": "#E6E6FA", 
+    "primary": "#8B008B",
+    "background": "#FFF8DC",
+    "wish_box": "#E6E6FA",
     "eid_green": "#4CAF50"
 }
 
@@ -50,11 +49,16 @@ def save_wish(sender, wish):
         file.write(f"{sender}|{wish}\n")
 
 def load_wishes():
-    """Load saved wishes from file."""
+    """Load saved wishes from file safely."""
     wishes = []
     if os.path.exists(SAVE_FILE):
         with open(SAVE_FILE, "r") as file:
-            wishes = [line.strip().split("|") for line in file.readlines()]
+            for line in file:
+                parts = line.strip().split("|")
+                if len(parts) == 2:  # Ensure proper format
+                    wishes.append(parts)
+                else:
+                    st.warning(f"Skipping invalid line: {line.strip()}")  # Debugging
     return wishes
 
 def delete_wish(sender, wish):
@@ -68,7 +72,7 @@ def delete_wish(sender, wish):
 def display_eid_wishes(name, category):
     """Displays a random Eid wish for the given name and category."""
     st.markdown(
-        f"<h3 style='text-align: center; color: {COLORS['primary']}'>Eid Wishes for {name} 🎉</h3>", 
+        f"<h3 style='text-align: center; color: {COLORS['primary']}'>Eid Wishes for {name} 🎉</h3>",
         unsafe_allow_html=True
     )
     wish = random.choice(WISHES[category])
@@ -77,17 +81,16 @@ def display_eid_wishes(name, category):
         <div style='background-color: {COLORS['wish_box']}; padding: 20px; border-radius: 10px; text-align: center; margin: 10px 0;'>
             <p style='font-size: 18px;'>{wish}</p>
         </div>
-        """, 
+        """,
         unsafe_allow_html=True
     )
+
 def display_countdown():
     """Displays a countdown to Eid or an 'Eid Mubarak' message."""
-    # Ensure the correct timezone (Set to your local timezone if needed)
     tz = pytz.timezone("Asia/Karachi")  # Change according to your region
-    today = datetime.datetime.now(tz).date()  # Use timezone-aware date
+    today = datetime.datetime.now(tz).date()
     days_until_eid = (EID_DATE - today).days
 
-    # Ensure it does not display an extra day
     if days_until_eid < 0:
         days_until_eid = 0
 
@@ -101,7 +104,7 @@ def display_countdown():
             """,
             unsafe_allow_html=True
         )
-    elif days_until_eid == 0:
+    else:
         st.markdown(
             f"""
             <div style='text-align: center; padding: 30px; border-radius: 15px; background-color: {COLORS['eid_green']}; margin-bottom: 20px;'>
@@ -111,20 +114,11 @@ def display_countdown():
             """,
             unsafe_allow_html=True
         )
-    else:
-        st.markdown(
-            """
-            <div style='text-align: center; padding: 20px; border-radius: 10px; background-color: #f0f0f0; margin-bottom: 20px;'>
-                <p style='font-size: 24px; color: #888;'>Eid has passed. Wishing you continued blessings. 🌙</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
 
 def user_input_wish():
     """Allows the user to input and manage their personalized Eid wishes."""
     st.markdown(
-        f"<h4 style='text-align: center; color: {COLORS['primary']}'> Send Best Wishes to Rida Fatima!💌</h4>", 
+        f"<h4 style='text-align: center; color: {COLORS['primary']}'> Send Best Wishes to Rida Fatima!💌</h4>",
         unsafe_allow_html=True
     )
     sender_name = st.text_input("Enter Your Name:")
@@ -136,6 +130,7 @@ def user_input_wish():
         else:
             save_wish(sender_name, user_wish)
             st.success("✅ Your wish has been saved!")
+            st.rerun()
 
     # --- Display saved wishes ---
     st.markdown(f"<h3 style='text-align: center; color: {COLORS['primary']}'>📜 Wishes Received by Rida:</h3>", unsafe_allow_html=True)
@@ -145,7 +140,7 @@ def user_input_wish():
         st.info("No wishes sent yet.")
     else:
         for sender, wish in wishes:
-            with st.expander(f"from {sender}💌"):
+            with st.expander(f"From {sender} 💌"):
                 st.write(wish)
                 if st.button(f"🗑 Delete Wish", key=f"delete_{sender}_{wish}"):
                     delete_wish(sender, wish)
@@ -153,8 +148,9 @@ def user_input_wish():
 
 # --- Main App ---
 st.set_page_config(page_title="Eid Wishes App", page_icon="🌙", layout="centered")
+
 st.markdown(
-    f"<h1 style='text-align: center; color: {COLORS['primary']}'>Eid Ul Fitr Greetings!🌙</h1>", 
+    f"<h1 style='text-align: center; color: {COLORS['primary']}'>Eid Ul Fitr Greetings!🌙</h1>",
     unsafe_allow_html=True
 )
 
@@ -172,6 +168,6 @@ user_input_wish()
 # Footer
 st.markdown("----------------------------------------------------------------------------------------------------")
 st.markdown(
-    "<p style='text-align: center; font-size: small;'>💖 Created with love by <strong>Rida Fatima</strong></p>", 
+    "<p style='text-align: center; font-size: small;'>💖 Created with love by <strong>Rida Fatima</strong></p>",
     unsafe_allow_html=True
 )
