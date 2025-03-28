@@ -145,7 +145,7 @@ def user_input_wish():
         st.info("No wishes sent yet.")
     else:
         for sender, wish in wishes:
-            with st.expander(f"from {sender}'s 💌"):
+            with st.expander(f"from {sender}💌"):
                 st.write(wish)
                 if st.button(f"🗑 Delete Wish", key=f"delete_{sender}_{wish}"):
                     delete_wish(sender, wish)
