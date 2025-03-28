@@ -4,7 +4,8 @@ import pytz
 import random
 import os
 
-# --- Configuration ---
+# MADE A EID WISHES APP
+#CONSTANT
 EID_DATE = datetime.date(2025, 3, 31)  # Approximate Eid date for 2025
 SAVE_FILE = "save.txt"  # File to store user wishes
 
@@ -144,7 +145,7 @@ def user_input_wish():
         st.info("No wishes sent yet.")
     else:
         for sender, wish in wishes:
-            with st.expander(f"💌 {sender}'s Wish"):
+            with st.expander(f"from {sender}'s 💌"):
                 st.write(wish)
                 if st.button(f"🗑 Delete Wish", key=f"delete_{sender}_{wish}"):
                     delete_wish(sender, wish)
